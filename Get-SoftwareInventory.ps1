@@ -244,11 +244,12 @@ foreach($Computer in $RemoteComputer) {
     # $csvFile = ''
 
     # Fetch installed programs
+    # this is the original line --> $InstalledPrograms = Get-RemoteProgram -ComputerName $computer -Property Publisher,InstallDate,DisplayVersion,IsMinorUpgrade,ReleaseType,ParentDisplayName,SystemComponent | Where-Object {[string]$_.SystemComponent -ne 1 -and ![string]$_.IsMinorUpgrade -and ![string]$_.ReleaseType -and ![string]$_.ParentDisplayName} | Sort-Object -Property ProgramName 
     $InstalledPrograms = Get-RemoteProgram -ComputerName $computer -Property Publisher,InstallDate,DisplayVersion,IsMinorUpgrade,ReleaseType,ParentDisplayName,SystemComponent | Where-Object {[string]$_.SystemComponent -ne 1 -and ![string]$_.IsMinorUpgrade -and ![string]$_.ReleaseType -and ![string]$_.ParentDisplayName} | Sort-Object -Property ProgramName 
 
     if( $InstalledPrograms -ne $null) {
         $csvInstalledPrograms = ('{0}\InstalledPrograms-{1}.csv' -f $ScriptDir, $computer.ToUpper())
-        $InstalledPrograms | Export-Csv -Path $csvInstalledPrograms -Force -Encoding UTF8 -NoTypeInformation -Delimiter ';'
+        $InstalledPrograms | Export-Csv -Path $csvInstalledPrograms -Force -Encoding UTF8 -NoTypeInformation -Delimiter ','
         $HtmlReport += $InstalledPrograms | ConvertTo-Html -Fragment -PreContent ('<h1>{0}</h1><h2>Installed Programs</h2>' -f $computer.ToUpper())
         $Attachments += $csvInstalledPrograms
     }
@@ -256,31 +257,31 @@ foreach($Computer in $RemoteComputer) {
         $HtmlReport += ('<h1>{0}</h1><h2>Installed Programs</h2><p>Error fetching installed programs</p>' -f $computer.ToUpper())
     }
 
-    # Fetch installed updates
-    $InstalledUpdates = Get-RemoteProgram -ComputerName $computer -Property Publisher,InstallDate,DisplayVersion,IsMinorUpgrade,ReleaseType,ParentDisplayName,SystemComponent | Where-Object {[string]$_.SystemComponent -ne 1 -and ([string]$_.IsMinorUpgrade -or [string]$_.ReleaseType -or [string]$_.ParentDisplayName)} | Sort-Object -Property ParentDisplayName,ProgramName
+    # # Fetch installed updates
+    # $InstalledUpdates = Get-RemoteProgram -ComputerName $computer -Property Publisher,InstallDate,DisplayVersion,IsMinorUpgrade,ReleaseType,ParentDisplayName,SystemComponent | Where-Object {[string]$_.SystemComponent -ne 1 -and ([string]$_.IsMinorUpgrade -or [string]$_.ReleaseType -or [string]$_.ParentDisplayName)} | Sort-Object -Property ParentDisplayName,ProgramName
 
-    if($InstalledUpdates -ne $null) {
-        $csvInstalledUpdates = ('{0}\InstalledUpdates-{1}.csv' -f $ScriptDir, $computer.ToUpper())
-        $InstalledUpdates | Export-Csv -Path $csvInstalledUpdates -Force -Encoding UTF8 -NoTypeInformation -Delimiter ';'
-        $HtmlReport += $InstalledUpdates | ConvertTo-Html -Fragment -PreContent '<h2>Installed Updates</h2>'
-        $Attachments += $csvInstalledUpdates
-    }
-    else {
-        $HtmlReport += ('<h1>{0}</h1><h2>Installed Updates</h2><p>Error fetching installed updates</p>' -f $computer.ToUpper())
-    }
+    # if($InstalledUpdates -ne $null) {
+    #     $csvInstalledUpdates = ('{0}\InstalledUpdates-{1}.csv' -f $ScriptDir, $computer.ToUpper())
+    #     $InstalledUpdates | Export-Csv -Path $csvInstalledUpdates -Force -Encoding UTF8 -NoTypeInformation -Delimiter ','
+    #     $HtmlReport += $InstalledUpdates | ConvertTo-Html -Fragment -PreContent '<h2>Installed Updates</h2>'
+    #     $Attachments += $csvInstalledUpdates
+    # }
+    # else {
+    #     $HtmlReport += ('<h1>{0}</h1><h2>Installed Updates</h2><p>Error fetching installed updates</p>' -f $computer.ToUpper())
+    # }
 
-    # Fetch installed components
-    $InstalledComponents = Get-RemoteProgram -ComputerName $computer -Property Publisher,InstallDate,DisplayVersion,IsMinorUpgrade,ReleaseType,ParentDisplayName,SystemComponent | Where-Object {[string]$_.SystemComponent -eq 1} | Sort-Object -Property ProgramName
+    # # Fetch installed components
+    # $InstalledComponents = Get-RemoteProgram -ComputerName $computer -Property Publisher,InstallDate,DisplayVersion,IsMinorUpgrade,ReleaseType,ParentDisplayName,SystemComponent | Where-Object {[string]$_.SystemComponent -eq 1} | Sort-Object -Property ProgramName
 
-    if($InstalledComponents -ne $null) {
-        $csvInstalledComponents = ('{0}\InstalledComponents-{1}.csv' -f $ScriptDir, $computer.ToUpper())
-        $InstalledComponents | Export-Csv -Path $csvInstalledComponents -Force -Encoding UTF8 -NoTypeInformation -Delimiter ';'
-        $HtmlReport += $InstalledComponents | ConvertTo-Html -Fragment -PreContent '<h2>Installed Components</h2>'
-        $Attachments += $csvInstalledComponents
-    }
-    else {
-        $HtmlReport += ('<h1>{0}</h1><h2>Installed Components</h2><p>Error fetching installed components</p>' -f $computer.ToUpper())
-    }
+    # if($InstalledComponents -ne $null) {
+    #     $csvInstalledComponents = ('{0}\InstalledComponents-{1}.csv' -f $ScriptDir, $computer.ToUpper())
+    #     $InstalledComponents | Export-Csv -Path $csvInstalledComponents -Force -Encoding UTF8 -NoTypeInformation -Delimiter ','
+    #     $HtmlReport += $InstalledComponents | ConvertTo-Html -Fragment -PreContent '<h2>Installed Components</h2>'
+    #     $Attachments += $csvInstalledComponents
+    # }
+    # else {
+    #     $HtmlReport += ('<h1>{0}</h1><h2>Installed Components</h2><p>Error fetching installed components</p>' -f $computer.ToUpper())
+    # }
 
     # Generate full html report
     [string]$HtmlReport = ConvertTo-Html -Body $HtmlReport -Head $head -Title $ReportTitle 
